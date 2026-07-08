@@ -123,8 +123,23 @@
 
   function validate(v) {
     const errors = [];
+    if (!v.character_name) errors.push("Character Name (Q1)");
     if (!v.head_type) errors.push("Head Type (Q2)");
     if (!v.contact_info) errors.push("Contact Information (Q3)");
+    if (!v.source) errors.push("Source of the Character (Q4)");
+    if (!v.ordered_before) errors.push("Have you ordered from us before? (Q5)");
+    if (!v.proportion) errors.push("Head Proportion (Q6)");
+    if (!v.eye_type) errors.push("Eye Type (Q7)");
+    if (!v.wig_treatment) errors.push("Wig Treatment (Q8)");
+    if (!v.ponytail) errors.push("Ponytail Options (Q9)");
+    if (!v.wig_color) errors.push("Wig Color (Q10)");
+    if (!v.skin) errors.push("Skin Tone (Q11)");
+    if (!v.head_height) errors.push("Head Height (Q12)");
+    if (!v.head_width) errors.push("Head Width (Q12)");
+    if (!v.head_circumference) errors.push("Head Circumference (Q12)");
+    if (!v.shoulder_width) errors.push("Shoulder Width (Q12)");
+    if (!v.body_height) errors.push("Body Height (Q12)");
+    if (!v.body_weight) errors.push("Body Weight (Q12)");
     if (!state.images.makeup_ref) errors.push("Modeling & Makeup Reference image (Q14)");
     if (v.head_type === "2" && !state.images.face1) errors.push("Face 1 image (Q14)");
     if (!state.images.eye_design) errors.push("Eye Design image (Q15)");
