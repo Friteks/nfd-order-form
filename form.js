@@ -291,7 +291,7 @@
         let size = 10;
         const maxWidth = rect.width - 4;
         while (size > 6 && font.widthOfTextAtSize(text, size) > maxWidth) size -= 0.5;
-        page.drawText(text, { x: rect.x + 2, y: rect.y + 2, size, font, color: ink });
+        page.drawText(text, { x: rect.x + 2, y: rect.y + 4, size, font, color: ink });
       }
 
       function drawCheck(key) {
