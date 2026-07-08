@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NFD Order Form</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="form-header">
+  <strong>NFD Order Form</strong>
+  <a href="index.html">&larr; Back</a>
+</div>
+
+<main class="form-wrap">
+  <form id="order-form" novalidate>
+
+    <fieldset class="q">
+      <legend>1. Character Name <span class="zh">[ 角色名 ]</span></legend>
+      <p class="hint">If possible, provide both an English and Chinese name.</p>
+      <input type="text" id="character_name" name="character_name" placeholder="e.g. Furina / 芙宁娜">
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>2. Head Type <span class="zh">[ 头壳类型 ]</span> <span class="required-mark">*</span></legend>
+      <label class="opt"><input type="radio" name="head_type" value="1" required> Full Head with one face <span class="zh">[ 全头 ]</span></label>
+      <label class="opt"><input type="radio" name="head_type" value="2"> Full Head with multiple faces <span class="zh">[ 全头可换脸（几张脸）]</span></label>
+      <label class="opt"><input type="radio" name="head_type" value="3"> Three quarter Head <span class="zh">[ 四分之三 ]</span></label>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>3. Contact Information (QQ / Email) <span class="zh">[ 联系方式 ]</span> <span class="required-mark">*</span></legend>
+      <input type="text" id="contact_info" name="contact_info" placeholder="QQ number or email address" required>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>4. Source of the Character <span class="zh">[ 出自作品 ]</span></legend>
+      <p class="hint">Name of the Anime / Game. If possible, provide both an English and Chinese name.</p>
+      <input type="text" id="source" name="source" placeholder="e.g. Genshin Impact / 原神">
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>5. Have you ordered from us before? <span class="zh">[ 否定制过本家头壳 ]</span></legend>
+      <label class="opt"><input type="radio" name="ordered_before" value="yes"> Yes <span class="zh">[ 定制过 ]</span></label>
+      <label class="opt"><input type="radio" name="ordered_before" value="no"> No <span class="zh">[ 没有 ]</span></label>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>6. Head Proportion <span class="zh">[ 头壳大小特殊要求 ]</span></legend>
+      <label class="opt"><input type="radio" name="proportion" value="standard" checked> Standard <span class="zh">[ 正常比例 ]</span></label>
+      <label class="opt"><input type="radio" name="proportion" value="larger"> Larger <span class="zh">[ 做大 ]</span></label>
+      <label class="opt"><input type="radio" name="proportion" value="smaller"> Smaller <span class="zh">[ 做小 ]</span></label>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>7. Eye Type <span class="zh">[ 眼片选择 ]</span></legend>
+      <label class="opt"><input type="radio" name="eye_type" value="1"> PVC + Photo Paper <span class="zh">[ PVC+相纸 ]</span></label>
+      <label class="opt"><input type="radio" name="eye_type" value="2"> Photo Paper <span class="zh">[ 全相纸 ]</span></label>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>8. Wig Treatment <span class="zh">[ 假发特殊工艺选择 ]</span></legend>
+      <label class="opt"><input type="radio" name="wig_treatment" value="default" checked> Default <span class="zh">[ 无要求 ]</span></label>
+      <label class="opt"><input type="radio" name="wig_treatment" value="noheat"> No Use of Heat tools <span class="zh">[ 一定不要烫发 ]</span></label>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>9. Ponytail Options <span class="zh">[ 马尾要求 ]</span></legend>
+      <label class="opt"><input type="radio" name="ponytail" value="loose"> Loose hair in the back <span class="zh">[ 散发 ]</span></label>
+      <label class="opt"><input type="radio" name="ponytail" value="glued"> Glued down hair in the back <span class="zh">[ 分缝 ]</span></label>
+      <label class="opt"><input type="radio" name="ponytail" value="detachable"> Detachable Twin Tails <span class="zh">[ 插拔马尾 ]</span></label>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>10. Wig Color <span class="zh">[ 假发发色 ]</span></legend>
+      <p class="hint">Enter the number of the color card.</p>
+      <input type="text" id="wig_color" name="wig_color" placeholder="e.g. #12">
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>11. Skin Tone <span class="zh">[ 肤色要求 ]</span></legend>
+      <label class="opt"><input type="radio" name="skin" value="default" checked> Default <span class="zh">[ 默认肤色 ]</span></label>
+      <label class="opt"><input type="radio" name="skin" value="custom"> Custom Color <span class="zh">[ 异色 ]</span></label>
+      <div class="conditional" id="skin_custom_wrap">
+        <input type="text" id="skin_custom_text" name="skin_custom_text" placeholder="Describe the custom skin color">
+      </div>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>12. Size Chart <span class="zh">[ 尺寸图 ]</span></legend>
+      <div class="num-row"><label for="head_height">1. Head Height <span class="zh">[ 头高 ]</span></label><input type="number" step="0.1" id="head_height" name="head_height"><span class="unit">cm</span></div>
+      <div class="num-row"><label for="head_width">2. Head Width <span class="zh">[ 脸宽 ]</span></label><input type="number" step="0.1" id="head_width" name="head_width"><span class="unit">cm</span></div>
+      <div class="num-row"><label for="head_circumference">3. Head Circumference <span class="zh">[ 头围 ]</span></label><input type="number" step="0.1" id="head_circumference" name="head_circumference"><span class="unit">cm</span></div>
+      <div class="num-row"><label for="shoulder_width">4. Shoulder Width <span class="zh">[ 肩宽 ]</span></label><input type="number" step="0.1" id="shoulder_width" name="shoulder_width"><span class="unit">cm</span></div>
+      <div class="num-row"><label for="body_height">5. Body Height <span class="zh">[ 身高 ]</span></label><input type="number" step="0.1" id="body_height" name="body_height"><span class="unit">cm</span></div>
+      <div class="num-row"><label for="body_weight">6. Body Weight <span class="zh">[ 体重 ]</span></label><input type="number" step="0.1" id="body_weight" name="body_weight"><span class="unit">kg</span></div>
+      <p style="margin:.8rem 0 .3rem; font-size:.95rem;">7. Gender (optional) <span class="zh">[ 性别 ]</span></p>
+      <label class="opt"><input type="radio" name="gender" value="male"> male <span class="zh">[ 男 ]</span></label>
+      <label class="opt"><input type="radio" name="gender" value="female"> female <span class="zh">[ 女 ]</span></label>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>13. Accessories <span class="zh">[ 配件选择 ]</span></legend>
+      <label class="opt"><input type="checkbox" id="acc_light_eyes" name="acc_light_eyes"> Light up Eyes <span class="zh">[ 发光眼 ]</span></label>
+      <label class="opt"><input type="checkbox" id="acc_fan" name="acc_fan"> Fan <span class="zh">[ 电风扇 ]</span></label>
+      <label class="opt"><input type="checkbox" id="acc_extra_eyes" name="acc_extra_eyes"> Extra Eyes (image required) <span class="zh">[ 追加眼片 ]</span></label>
+      <div class="conditional" id="acc_extra_eyes_img_wrap">
+        <div class="file-drop" data-target="acc_extra_eyes_img">Click to upload extra eyes reference image<input type="file" id="acc_extra_eyes_img" accept="image/*"></div>
+        <div class="thumbs" id="acc_extra_eyes_img_thumbs"></div>
+      </div>
+      <label class="opt"><input type="checkbox" id="acc_props" name="acc_props"> Accessories or Props (image required) <span class="zh">[ 配饰 ]</span></label>
+      <div class="conditional" id="acc_props_img_wrap">
+        <div class="file-drop" data-target="acc_props_img">Click to upload props / accessories reference image<input type="file" id="acc_props_img" accept="image/*"></div>
+        <div class="thumbs" id="acc_props_img_thumbs"></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>14. Modeling &amp; Makeup Reference <span class="zh">[ 建模表情图和妆面图 ]</span> <span class="required-mark">*</span></legend>
+      <p class="hint">The head will be modeled after this image (submit one image only).</p>
+      <div class="file-drop" data-target="makeup_ref">Click to upload reference image<input type="file" id="makeup_ref" accept="image/*"></div>
+      <div class="thumbs" id="makeup_ref_thumbs"></div>
+
+      <div class="conditional" id="faces_wrap">
+        <p class="hint" style="margin-top:1rem;">When ordering multiple faces, specify the expression for each face individually (one image per face).</p>
+        <p style="margin:.6rem 0 .3rem;">Face 1 <span class="zh">[ 脸一 ]</span></p>
+        <div class="file-drop" data-target="face1">Click to upload<input type="file" id="face1" accept="image/*"></div>
+        <div class="thumbs" id="face1_thumbs"></div>
+        <p style="margin:.9rem 0 .3rem;">Face 2 <span class="zh">[ 脸二 ]</span></p>
+        <div class="file-drop" data-target="face2">Click to upload<input type="file" id="face2" accept="image/*"></div>
+        <div class="thumbs" id="face2_thumbs"></div>
+        <p style="margin:.9rem 0 .3rem;">Face 3 <span class="zh">[ 脸三 ]</span></p>
+        <div class="file-drop" data-target="face3">Click to upload<input type="file" id="face3" accept="image/*"></div>
+        <div class="thumbs" id="face3_thumbs"></div>
+      </div>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>15. Eye Design <span class="zh">[ 眼片图 ]</span> <span class="required-mark">*</span></legend>
+      <p class="hint">The eyes will be painted according to this picture (submit one image only).</p>
+      <div class="file-drop" data-target="eye_design">Click to upload<input type="file" id="eye_design" accept="image/*"></div>
+      <div class="thumbs" id="eye_design_thumbs"></div>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>16. Hairstyle Reference <span class="zh">[ 发型图 ]</span> <span class="required-mark">*</span></legend>
+      <p class="hint">The wig will be styled according to this image (submit one or more images).</p>
+      <div class="file-drop" data-target="hairstyle" data-multi="true">Click to upload one or more images<input type="file" id="hairstyle" accept="image/*" multiple></div>
+      <div class="thumbs" id="hairstyle_thumbs"></div>
+    </fieldset>
+
+    <fieldset class="q">
+      <legend>17. Additional References <span class="zh">[ 次要参考图 ]</span></legend>
+      <p class="hint">Optional &mdash; additional images of your character from multiple angles.</p>
+      <div class="file-drop" data-target="additional" data-multi="true">Click to upload one or more images<input type="file" id="additional" accept="image/*" multiple></div>
+      <div class="thumbs" id="additional_thumbs"></div>
+    </fieldset>
+
+  </form>
+</main>
+
+<div class="submit-bar">
+  <div class="status" id="status"></div>
+  <button class="btn" id="generate-btn" type="button">Generate PDF</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+<script src="coords.js"></script>
+<script src="form.js"></script>
+</body>
+</html>
