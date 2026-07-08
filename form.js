@@ -8,14 +8,14 @@
       makeup_ref: null,
       faces: [],
       eye_design: null,
-      acc_extra_eyes_img: null,
-      acc_props_img: null,
+      acc_extra_eyes_img: [],
+      acc_props_img: [],
       hairstyle: [],
       additional: [],
     },
   };
 
-  const MULTI_FIELDS = new Set(["hairstyle", "additional"]);
+  const MULTI_FIELDS = new Set(["hairstyle", "additional", "acc_extra_eyes_img", "acc_props_img"]);
 
   // ---------- file upload UI (static fields) ----------
 
@@ -68,7 +68,7 @@
     });
   });
 
-  // ---------- dynamic faces list ----------
+  // ---------- dynamic faces list (one image per face) ----------
 
   function renderFaces() {
     const container = document.getElementById("faces_list");
@@ -222,29 +222,38 @@
     if (v.head_type === "2" && !state.images.faces[0]) errors.push("Face 1 image (Q14)");
     if (!state.images.eye_design) errors.push("Eye Design image (Q15)");
     if (state.images.hairstyle.length === 0) errors.push("Hairstyle Reference image (Q16)");
-    if (v.acc_extra_eyes && !state.images.acc_extra_eyes_img) errors.push("Extra Eyes reference image (Q13)");
-    if (v.acc_props && !state.images.acc_props_img) errors.push("Accessories/Props reference image (Q13)");
+    if (v.acc_extra_eyes && state.images.acc_extra_eyes_img.length === 0) errors.push("Extra Eyes reference image (Q13)");
+    if (v.acc_props && state.images.acc_props_img.length === 0) errors.push("Accessories/Props reference image (Q13)");
     return errors;
   }
 
   // ---------- pdf generation ----------
 
-  async function embedImage(pdfDoc, file, bytes) {
-    if (file.type === "image/png") return pdfDoc.embedPng(bytes);
-    if (file.type === "image/jpeg" || file.type === "image/jpg") return pdfDoc.embedJpg(bytes);
-    const converted = await convertToPngBytes(file);
-    return pdfDoc.embedPng(converted);
-  }
-
-  async function convertToPngBytes(file) {
-    const bitmap = await createImageBitmap(file);
+  // Embeds an image respecting its EXIF orientation (photos taken on phones
+  // are otherwise embedded sideways/rotated, since pdf-lib draws raw pixel
+  // data and ignores EXIF rotation tags). Also downsizes very large photos
+  // to keep the generated PDF a reasonable size.
+  async function embedImage(pdfDoc, file) {
+    const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+    const maxDim = 1600;
+    let { width, height } = bitmap;
+    if (width > maxDim || height > maxDim) {
+      const scale = Math.min(maxDim / width, maxDim / height);
+      width = Math.max(1, Math.round(width * scale));
+      height = Math.max(1, Math.round(height * scale));
+    }
     const canvas = document.createElement("canvas");
-    canvas.width = bitmap.width;
-    canvas.height = bitmap.height;
+    canvas.width = width;
+    canvas.height = height;
     const ctx = canvas.getContext("2d");
-    ctx.drawImage(bitmap, 0, 0);
-    const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
-    return new Uint8Array(await blob.arrayBuffer());
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(bitmap, 0, 0, width, height);
+    const usePng = file.type === "image/png";
+    const mime = usePng ? "image/png" : "image/jpeg";
+    const blob = await new Promise((res) => canvas.toBlob(res, mime, usePng ? undefined : 0.88));
+    const bytes = new Uint8Array(await blob.arrayBuffer());
+    return usePng ? pdfDoc.embedPng(bytes) : pdfDoc.embedJpg(bytes);
   }
 
   function sanitizeFilename(s) {
@@ -301,8 +310,7 @@
       }
 
       async function fitImageInRect(page, rect, file, pad) {
-        const bytes = await file.arrayBuffer();
-        const img = await embedImage(pdfDoc, file, bytes);
+        const img = await embedImage(pdfDoc, file);
         const availW = rect.width - pad * 2;
         const availH = rect.height - pad * 2;
         const scale = Math.min(availW / img.width, availH / img.height, 1) || Math.min(availW / img.width, availH / img.height);
@@ -342,8 +350,7 @@
             const cellX = rect.x + pad + col * (cellW + gap);
             const cellTop = rect.y + rect.height - pad - row * (cellH + gap);
             const file = group[i];
-            const bytes = await file.arrayBuffer();
-            const img = await embedImage(pdfDoc, file, bytes);
+            const img = await embedImage(pdfDoc, file);
             const scale = Math.min(cellW / img.width, cellH / img.height, 1) || Math.min(cellW / img.width, cellH / img.height);
             const w = img.width * scale;
             const h = img.height * scale;
@@ -410,23 +417,24 @@
       // --- single images ---
       await drawImageInBox("makeup_ref", state.images.makeup_ref);
       await drawImageInBox("eye_design", state.images.eye_design);
-      await drawImageInBox("acc_extra_eyes_img", state.images.acc_extra_eyes_img);
-      await drawImageInBox("acc_props_img", state.images.acc_props_img);
       if (v.head_type === "2") {
         await drawFaces(state.images.faces);
       }
 
-      // --- multi images ---
+      // --- multi images (grid within the template's boxes) ---
+      await drawImagesGrid(["acc_extra_eyes_img"], state.images.acc_extra_eyes_img);
+      await drawImagesGrid(["acc_props_img"], state.images.acc_props_img);
       await drawImagesGrid(["hairstyle_1", "hairstyle_2"], state.images.hairstyle);
       await drawImagesGrid(["additional_1", "additional_2"], state.images.additional);
 
       const bytes = await pdfDoc.save();
       const blob = new Blob([bytes], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
-      const nameBase = sanitizeFilename(v.character_name) || "order-form";
+      const nameBase = sanitizeFilename(v.character_name);
+      const filename = nameBase ? `NFD-Orderform-${nameBase}.pdf` : "NFD-Orderform.pdf";
       const a = document.createElement("a");
       a.href = url;
-      a.download = `NFD-${nameBase}.pdf`;
+      a.download = filename;
       document.body.appendChild(a);
       a.click();
       a.remove();
