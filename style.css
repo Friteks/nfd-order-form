@@ -124,8 +124,7 @@ footer {
   position: sticky;
   top: 0;
   z-index: 10;
-  background: rgba(250,247,245,.92);
-  backdrop-filter: blur(6px);
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
   padding: .8rem 1.25rem;
   display: flex;
@@ -252,4 +251,18 @@ input[type="text"], input[type="number"], input[type="email"] {
   max-width: 760px;
 }
 
-.form-wrap { padding-bottom: 6rem; }
+.form-wrap {
+  margin-top: 0;
+  padding-top: 1.25rem;
+  padding-bottom: 6rem;
+}
+
+.ref-img {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  margin-bottom: .9rem;
+  border: 1px solid var(--border);
+}
