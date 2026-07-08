@@ -12,6 +12,22 @@
 
 * { box-sizing: border-box; }
 
+.credit-badge {
+  position: fixed;
+  top: .6rem;
+  right: .8rem;
+  z-index: 50;
+  background: rgba(0,0,0,.4);
+  color: #fff;
+  font-size: .7rem;
+  line-height: 1.3;
+  padding: .35rem .65rem;
+  border-radius: 999px;
+  max-width: 220px;
+  text-align: right;
+  backdrop-filter: blur(4px);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
