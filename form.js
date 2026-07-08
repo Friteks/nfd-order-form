@@ -6,9 +6,7 @@
   const state = {
     images: {
       makeup_ref: null,
-      face1: null,
-      face2: null,
-      face3: null,
+      faces: [],
       eye_design: null,
       acc_extra_eyes_img: null,
       acc_props_img: null,
@@ -19,7 +17,7 @@
 
   const MULTI_FIELDS = new Set(["hairstyle", "additional"]);
 
-  // ---------- file upload UI ----------
+  // ---------- file upload UI (static fields) ----------
 
   function renderThumbs(key) {
     const box = document.getElementById(key + "_thumbs");
@@ -70,6 +68,81 @@
     });
   });
 
+  // ---------- dynamic faces list ----------
+
+  function renderFaces() {
+    const container = document.getElementById("faces_list");
+    container.innerHTML = "";
+    state.images.faces.forEach((file, idx) => {
+      const slot = document.createElement("div");
+      slot.className = "face-slot";
+
+      const title = document.createElement("div");
+      title.className = "face-slot-title";
+      const label = document.createElement("span");
+      label.textContent = `Face ${idx + 1}`;
+      title.appendChild(label);
+      if (idx > 0) {
+        const rm = document.createElement("button");
+        rm.type = "button";
+        rm.className = "face-remove";
+        rm.textContent = "Remove";
+        rm.addEventListener("click", () => {
+          state.images.faces.splice(idx, 1);
+          renderFaces();
+        });
+        title.appendChild(rm);
+      }
+      slot.appendChild(title);
+
+      const drop = document.createElement("div");
+      drop.className = "file-drop";
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      drop.textContent = file ? "Click to replace image" : "Click to upload";
+      drop.appendChild(input);
+      drop.addEventListener("click", () => input.click());
+      input.addEventListener("click", (e) => e.stopPropagation());
+      input.addEventListener("change", () => {
+        if (input.files && input.files[0]) {
+          state.images.faces[idx] = input.files[0];
+          renderFaces();
+        }
+      });
+      slot.appendChild(drop);
+
+      if (file) {
+        const thumbs = document.createElement("div");
+        thumbs.className = "thumbs";
+        const t = document.createElement("div");
+        t.className = "thumb";
+        const img = document.createElement("img");
+        img.src = URL.createObjectURL(file);
+        t.appendChild(img);
+        const rmThumb = document.createElement("button");
+        rmThumb.type = "button";
+        rmThumb.textContent = "×";
+        rmThumb.title = "Remove image";
+        rmThumb.addEventListener("click", (e) => {
+          e.stopPropagation();
+          state.images.faces[idx] = null;
+          renderFaces();
+        });
+        t.appendChild(rmThumb);
+        thumbs.appendChild(t);
+        slot.appendChild(thumbs);
+      }
+
+      container.appendChild(slot);
+    });
+  }
+
+  document.getElementById("add-face-btn").addEventListener("click", () => {
+    state.images.faces.push(null);
+    renderFaces();
+  });
+
   // ---------- conditional sections ----------
 
   function byName(name) {
@@ -86,7 +159,12 @@
   document.querySelectorAll('input[name="head_type"]').forEach((r) =>
     r.addEventListener("change", () => {
       const val = byName("head_type")?.value;
-      document.getElementById("faces_wrap").classList.toggle("show", val === "2");
+      const show = val === "2";
+      document.getElementById("faces_wrap").classList.toggle("show", show);
+      if (show && state.images.faces.length === 0) {
+        state.images.faces.push(null);
+        renderFaces();
+      }
     })
   );
 
@@ -141,7 +219,7 @@
     if (!v.body_height) errors.push("Body Height (Q12)");
     if (!v.body_weight) errors.push("Body Weight (Q12)");
     if (!state.images.makeup_ref) errors.push("Modeling & Makeup Reference image (Q14)");
-    if (v.head_type === "2" && !state.images.face1) errors.push("Face 1 image (Q14)");
+    if (v.head_type === "2" && !state.images.faces[0]) errors.push("Face 1 image (Q14)");
     if (!state.images.eye_design) errors.push("Eye Design image (Q15)");
     if (state.images.hairstyle.length === 0) errors.push("Hairstyle Reference image (Q16)");
     if (v.acc_extra_eyes && !state.images.acc_extra_eyes_img) errors.push("Extra Eyes reference image (Q13)");
@@ -222,14 +300,9 @@
         });
       }
 
-      async function drawImageInBox(key, file) {
-        if (!file) return;
-        const box = C.IMAGE_BOXES[key];
-        const rect = C.toPdfRect(box);
-        const page = pages[box.page];
+      async function fitImageInRect(page, rect, file, pad) {
         const bytes = await file.arrayBuffer();
         const img = await embedImage(pdfDoc, file, bytes);
-        const pad = 8;
         const availW = rect.width - pad * 2;
         const availH = rect.height - pad * 2;
         const scale = Math.min(availW / img.width, availH / img.height, 1) || Math.min(availW / img.width, availH / img.height);
@@ -238,6 +311,14 @@
         const x = rect.x + (rect.width - w) / 2;
         const y = rect.y + (rect.height - h) / 2;
         page.drawImage(img, { x, y, width: w, height: h });
+      }
+
+      async function drawImageInBox(key, file) {
+        if (!file) return;
+        const box = C.IMAGE_BOXES[key];
+        const rect = C.toPdfRect(box);
+        const page = pages[box.page];
+        await fitImageInRect(page, rect, file, 8);
       }
 
       async function drawImagesGrid(boxKeys, files) {
@@ -269,6 +350,32 @@
             const x = cellX + (cellW - w) / 2;
             const y = cellTop - cellH + (cellH - h) / 2;
             page.drawImage(img, { x, y, width: w, height: h });
+          }
+        }
+      }
+
+      // For faces beyond the 3 dedicated template pages (Face 1-3), append a
+      // simple extra page so any number of faces can be submitted.
+      async function drawExtraFacePage(faceNumber, file) {
+        const page = pdfDoc.addPage([C.PAGE_W, C.PAGE_H]);
+        page.drawText(`Face ${faceNumber}`, { x: 70.5, y: C.PAGE_H - 110, size: 16, font: fontBold, color: ink });
+        page.drawText("(additional face reference)", { x: 70.5, y: C.PAGE_H - 130, size: 10, font, color: ink });
+        const rect = { x: 70.5, y: 90, width: C.PAGE_W - 141, height: 600 };
+        page.drawRectangle({
+          x: rect.x, y: rect.y, width: rect.width, height: rect.height,
+          borderColor: PDFLib.rgb(0.82, 0.78, 0.75), borderWidth: 1,
+        });
+        await fitImageInRect(page, rect, file, 10);
+      }
+
+      async function drawFaces(faces) {
+        const valid = faces.filter((f) => f);
+        for (let i = 0; i < valid.length; i++) {
+          const file = valid[i];
+          if (i < 3) {
+            await drawImageInBox(["face1", "face2", "face3"][i], file);
+          } else {
+            await drawExtraFacePage(i + 1, file);
           }
         }
       }
@@ -306,9 +413,7 @@
       await drawImageInBox("acc_extra_eyes_img", state.images.acc_extra_eyes_img);
       await drawImageInBox("acc_props_img", state.images.acc_props_img);
       if (v.head_type === "2") {
-        await drawImageInBox("face1", state.images.face1);
-        await drawImageInBox("face2", state.images.face2);
-        await drawImageInBox("face3", state.images.face3);
+        await drawFaces(state.images.faces);
       }
 
       // --- multi images ---

@@ -127,16 +127,9 @@
       <div class="thumbs" id="makeup_ref_thumbs"></div>
 
       <div class="conditional" id="faces_wrap">
-        <p class="hint" style="margin-top:1rem;">When ordering multiple faces, specify the expression for each face individually (one image per face).</p>
-        <p style="margin:.6rem 0 .3rem;">Face 1 <span class="zh">[ 脸一 ]</span></p>
-        <div class="file-drop" data-target="face1">Click to upload<input type="file" id="face1" accept="image/*"></div>
-        <div class="thumbs" id="face1_thumbs"></div>
-        <p style="margin:.9rem 0 .3rem;">Face 2 <span class="zh">[ 脸二 ]</span></p>
-        <div class="file-drop" data-target="face2">Click to upload<input type="file" id="face2" accept="image/*"></div>
-        <div class="thumbs" id="face2_thumbs"></div>
-        <p style="margin:.9rem 0 .3rem;">Face 3 <span class="zh">[ 脸三 ]</span></p>
-        <div class="file-drop" data-target="face3">Click to upload<input type="file" id="face3" accept="image/*"></div>
-        <div class="thumbs" id="face3_thumbs"></div>
+        <p class="hint" style="margin-top:1rem;">When ordering multiple faces, specify the expression for each face individually (one image per face). Click below to add as many faces as you need.</p>
+        <div id="faces_list"></div>
+        <button type="button" id="add-face-btn" class="btn secondary">+ Add another face</button>
       </div>
     </fieldset>
 

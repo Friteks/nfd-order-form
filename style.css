@@ -232,6 +232,32 @@ input[type="text"], input[type="number"], input[type="email"] {
 .conditional { display: none; margin-top: .6rem; padding-top: .6rem; border-top: 1px dashed var(--border); }
 .conditional.show { display: block; }
 
+.face-slot {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .8rem;
+  margin-bottom: .7rem;
+  background: #fffefe;
+}
+.face-slot-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .9rem;
+  font-weight: 600;
+  margin-bottom: .5rem;
+}
+.face-remove {
+  background: none;
+  border: none;
+  color: var(--accent-dark);
+  font-size: .78rem;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+  font-weight: 500;
+}
+
 .submit-bar {
   position: sticky;
   bottom: 0;
